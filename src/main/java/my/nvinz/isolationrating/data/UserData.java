@@ -1,6 +1,9 @@
 package my.nvinz.isolationrating.data;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import javax.persistence.*;
+import java.time.ZonedDateTime;
 import java.util.Date;
 
 @Entity
@@ -8,20 +11,11 @@ import java.util.Date;
 public class UserData {
 
     @Id
-    private String id;
     private String ip;
     private double rating;
     private double latitude;
     private double longtitude;
-    private Date lastupdated;
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
+    private ZonedDateTime lastupdated;
 
     public String getIp() {
         return ip;
@@ -47,11 +41,11 @@ public class UserData {
         this.longtitude = longtitude;
     }
 
-    public Date getLastupdated() {
+    public ZonedDateTime getLastupdated() {
         return lastupdated;
     }
 
-    public void setLastupdated(Date lastupdated) {
+    public void setLastupdated(ZonedDateTime lastupdated) {
         this.lastupdated = lastupdated;
     }
 

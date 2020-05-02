@@ -7,9 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 
 
+@CrossOrigin(maxAge = 3600)
 @org.springframework.stereotype.Controller
 @RequestMapping("/api")
 public class Controller {
@@ -30,6 +32,12 @@ public class Controller {
     @RequestMapping(value = "/userdata", method = RequestMethod.POST)
     public @ResponseBody void setUserData(@RequestBody UserData userData) {
         dataService.updateUserData(userData);
+    }
+
+    @RequestMapping(value = "/alluserdata/{date}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody List<UserData> getNewUserData(@PathVariable("date") String dateString) {
+        ZonedDateTime zonedDateTime = ZonedDateTime.parse(dateString);
+        return (List<UserData>) dataService.getNewUserDate(zonedDateTime);
     }
 
     @RequestMapping(value = "/citydata/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
