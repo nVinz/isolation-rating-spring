@@ -3,6 +3,7 @@ package my.nvinz.isolationrating.data;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.time.ZonedDateTime;
 import java.util.Date;
 
 @Entity
@@ -14,7 +15,7 @@ public class CityData {
     private double rating;
     private double latitude;
     private double longtitude;
-    private Date lastupdated;
+    private ZonedDateTime lastupdated;
     private int count;
 
     public String getName() {
@@ -49,11 +50,11 @@ public class CityData {
         this.longtitude = longtitude;
     }
 
-    public Date getLastupdated() {
+    public ZonedDateTime getLastupdated() {
         return lastupdated;
     }
 
-    public void setLastupdated(Date lastupdated) {
+    public void setLastupdated(ZonedDateTime lastupdated) {
         this.lastupdated = lastupdated;
     }
 

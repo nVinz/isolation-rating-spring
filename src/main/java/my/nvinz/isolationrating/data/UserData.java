@@ -16,6 +16,7 @@ public class UserData {
     private double latitude;
     private double longtitude;
     private ZonedDateTime lastupdated;
+    private String color;
 
     public String getIp() {
         return ip;
@@ -55,5 +56,13 @@ public class UserData {
 
     public void setRating(double rating) {
         this.rating = rating;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
     }
 }

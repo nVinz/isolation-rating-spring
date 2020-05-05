@@ -1,15 +1,16 @@
 package my.nvinz.isolationrating.dataservice;
 
 import my.nvinz.isolationrating.data.CityData;
+import my.nvinz.isolationrating.data.UserColor;
 import my.nvinz.isolationrating.datarepository.CityDataRepository;
 import my.nvinz.isolationrating.datarepository.UserDataRepository;
 import my.nvinz.isolationrating.data.UserData;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.text.DecimalFormat;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 import static java.time.temporal.ChronoUnit.MINUTES;
@@ -23,7 +24,7 @@ public class DataService implements Service {
     private CityDataRepository cityDataRepository;
 
     public List<UserData> getAllUserData() {
-        List<UserData> userDataList = new ArrayList<>();
+        List<UserData> userDataList = new LinkedList<>();
         userDataRepository.findAll().forEach(userDataList::add);
         return userDataList;
     }
@@ -37,7 +38,13 @@ public class DataService implements Service {
     }
 
     public void updateUserData(UserData userData) {
-
+        // not in MSK
+        if (userData.getLatitude() > 56.055552 ||
+                userData.getLatitude() < 55.491693 ||
+                userData.getLongtitude() > 38.087612 ||
+                userData.getLongtitude() < 37.048991) {
+            return;
+        }
         if (userDataRepository.findById(userData.getIp()).isPresent()) {
             UserData user = userDataRepository.findById(userData.getIp()).get();
 
@@ -45,8 +52,6 @@ public class DataService implements Service {
             if (userData.getRating() == -1) {
                 userData.setRating(user.getRating());
             }
-
-            DecimalFormat decimalFormat = new DecimalFormat("#.##");
 
             // Value of 3 digits after dot for old & new coordinates: nnn.NNNnnn
             String userLatitude = String.valueOf(user.getLatitude());
@@ -75,17 +80,34 @@ public class DataService implements Service {
                 userData.setRating(userData.getRating() - timeDiff / 5.0 * 0.05);
                 if (userData.getRating() < 0) userData.setRating(0);
             }
-
-            //userData.setRating(decimalFormat.format(userData.getRating()));
         }
         else {
             userData.setRating(5);
         }
+        userData.setRating( BigDecimal.valueOf(userData.getRating())
+                .setScale(2, RoundingMode.HALF_UP)
+                .doubleValue());
+
+        // Map icon color
+        UserColor ratingColor;
+        if (userData.getRating() > 8.0) ratingColor = UserColor.GREEN;
+        else if (userData.getRating() > 4.0) ratingColor = UserColor.ORANGE;
+        else ratingColor = UserColor.RED;
+
+        userData.setColor(ratingColor.getColor());
+
         userDataRepository.save(userData);
     }
 
     public CityData getCityData(String name) {
-        return cityDataRepository.findById(name).orElse(null);
+        CityData cityData = cityDataRepository.findById(name).orElse(null);
+        if (cityData != null) {
+            LinkedList<UserData> userData = (LinkedList<UserData>) getNewUserDate(cityData.getLastupdated());
+            double sumRating = userData.stream()
+                    .mapToDouble(UserData::getRating)
+                    .sum() / userData.size();
+        }
+        return cityData;
     }
 
     public void updateCitydata(CityData cityData) {
@@ -98,7 +120,7 @@ public class DataService implements Service {
             if (city.getCount() != cityData.getCount() || cityData.getCount() == -1) {
 
                 double rating = 0;
-                List<UserData> userDataList = new ArrayList<>();
+                List<UserData> userDataList = new LinkedList<>();
 
                 userDataRepository.findAll().forEach(userDataList::add);
                 for (UserData data : userDataList) {
