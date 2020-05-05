@@ -53,7 +53,7 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
-					<mainClass>my.nvinz.rest1.Rest1</mainClass>
+					<mainClass>my.nvinz.isolationrating.IsolationRatingApplication</mainClass>
 				</configuration>
 				<executions>
 					<execution>
