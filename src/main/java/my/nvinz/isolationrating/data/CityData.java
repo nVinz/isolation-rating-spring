@@ -14,7 +14,7 @@ public class CityData {
     private String name;
     private double rating;
     private double latitude;
-    private double longtitude;
+    private double longtitude;          // TODO calculate borders
     private ZonedDateTime lastupdated;
     private int count;
 
