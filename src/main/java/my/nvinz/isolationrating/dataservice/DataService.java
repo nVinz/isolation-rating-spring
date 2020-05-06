@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -103,14 +104,14 @@ public class DataService implements Service {
     public CityData getCityData(String name) {
         CityData cityData = cityDataRepository.findById(name).orElse(null);
         if (cityData != null) {
-            ArrayList<UserData> userData = (ArrayList<UserData>) getNewUserDate(cityData.getLastupdated());
+            ArrayList<UserData> userData = (ArrayList<UserData>) getNewUserDate(cityData.getLastupdated().minus(1, ChronoUnit.DAYS));
 
-            double usersCount = userData.stream()
+            double usersRatingsSum = userData.stream()
                     .mapToDouble(UserData::getRating)
                     .sum();
 
             cityData.setCount(userData.size());
-            cityData.setRating(usersCount / userData.size());
+            cityData.setRating(usersRatingsSum / userData.size());
             cityData.setRating( BigDecimal.valueOf(cityData.getRating())
                     .setScale(2, RoundingMode.HALF_UP)
                     .doubleValue());
